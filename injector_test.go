@@ -67,7 +67,7 @@ func TestInjector(t *testing.T) {
 	t.Run("Simple", func(t *testing.T) {
 		var called bool
 		taken := "taken"
-		newType := func() (testType, func(), error) {
+		newType := func(i *Injector) (testType, func(), error) {
 			return testType{v: taken}, func() { called = true }, nil
 		}
 

@@ -1,15 +1,3 @@
-# Wire(less) 
-
-Wireless is great companion to [wire](https://github.com/google/wire) framework from google.
-To get best out of both wolrds we use generated code with wire + little bit of reflection.
-
-You can really think of wire as being container that can store dependencies.
-
-It's only good to use it if you have the reason for it. Wire on its own is very powerful
-
-## Example
-
-```golang
 package main
 
 import (
@@ -35,15 +23,6 @@ func (s *Service) Run() {
 	s.log.Log("running service on address: " + s.cfg.Addr)
 }
 
-func NewService(i *wireless.Injector) (*Service, func(), error) {
-	c := &Config{}
-	err := i.InjectAs(&c)
-	if err != nil {
-		return nil, nil, err
-	}
-	return &Service{cfg: c}, func() {}, nil
-}
-
 func main() {
 	cfg := &Config{
 		Addr: "localhost",
@@ -66,5 +45,3 @@ func main() {
 
 	s.Run()
 }
-
-```

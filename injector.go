@@ -23,11 +23,13 @@ var (
 
 // New creates a new injector.
 func New() *Injector {
-	return &Injector{
+	i := &Injector{
 		values:       map[reflect.Type]reflect.Value{},
 		providersMap: map[reflect.Type]*providerFunc{},
 		bindings:     map[reflect.Type]reflect.Type{},
 	}
+	i.values[reflect.TypeOf(i)] = reflect.ValueOf(i)
+	return i
 }
 
 // Injector is dynamic connection provider.
@@ -52,11 +54,12 @@ type Injector struct {
 // Inject tries to inject all the fields within provided input pointer to struct.
 // In order to omit a field it might use a struct field tag: 'wireless:"-"'.
 // Example:
-// 	type ExampleType struct {
+//
+//	type ExampleType struct {
 //		InjectMe 	*OtherType
 //		SkipMe 		*DifferentType `wireless:"-"
 //		skipPrivate *PrivateType
-// 	}
+//	}
 func (i *Injector) Inject(in interface{}) error {
 	i.lock.RLock()
 	defer i.lock.RUnlock()
