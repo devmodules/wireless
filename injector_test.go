@@ -3,9 +3,6 @@ package wireless
 import (
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type interfaceType interface {
@@ -27,13 +24,19 @@ func TestInjector(t *testing.T) {
 			Value(provider),
 		)
 		err := i.Resolve()
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
 		var ptr *testType
 		err = i.InjectAs(&ptr)
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
-		assert.Equal(t, ptr, provider)
+		if ptr != provider {
+			t.Errorf("Expected %v, got %v", provider, ptr)
+		}
 	})
 
 	t.Run("Type", func(t *testing.T) {
@@ -46,13 +49,19 @@ func TestInjector(t *testing.T) {
 		)
 
 		err := i.Resolve()
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
 		var as testType
 		err = i.InjectAs(&as)
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
-		assert.Equal(t, as, provider)
+		if as != provider {
+			t.Errorf("Expected %v, got %v", provider, as)
+		}
 	})
 
 	t.Run("Simple", func(t *testing.T) {
@@ -67,17 +76,25 @@ func TestInjector(t *testing.T) {
 			Func(newType),
 		)
 		err := i.Resolve()
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
 		var tt testType
 		err = i.InjectAs(&tt)
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
-		assert.Equal(t, tt.v, taken)
+		if tt.v != taken {
+			t.Errorf("Expected %v, got %v", taken, tt.v)
+		}
 
 		i.Clean()
 
-		assert.True(t, called)
+		if !called {
+			t.Error("Expected true, got false")
+		}
 	})
 
 	t.Run("Deps", func(t *testing.T) {
@@ -100,7 +117,6 @@ func TestInjector(t *testing.T) {
 
 		ptrValue := &testType{v: taken}
 		i := New()
-		// Expected flow is *testType value -> newType -> binding
 		i.Provide(
 			Func(newB),
 			Bind(new(interfaceType), new(testType)),
@@ -108,21 +124,28 @@ func TestInjector(t *testing.T) {
 			Func(newType),
 		)
 		err := i.Resolve()
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
 		var it interfaceType
 		err = i.InjectAs(&it)
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
 		tt, ok := it.(testType)
-		require.True(t, ok)
-
-		assert.Equal(t, tt.v, taken)
+		if !ok || tt.v != taken {
+			t.Errorf("Expected %v, got %v", taken, tt.v)
+		}
 
 		i.Clean()
-		assert.True(t, !bts.IsZero())
-		assert.True(t, !tpTs.IsZero())
-		assert.True(t, tpTs.Before(bts))
+		if bts.IsZero() {
+			t.Error("Expected non-zero time, got zero")
+		}
+		if tpTs.IsZero() || !tpTs.Before(bts) {
+			t.Error("Expected tpTs before bts and non-zero, got zero or after bts")
+		}
 	})
 
 	t.Run("Cycle", func(t *testing.T) {
@@ -142,7 +165,9 @@ func TestInjector(t *testing.T) {
 			Value(d{}),
 		)
 		err := i.Resolve()
-		assert.Error(t, err)
+		if err == nil {
+			t.Error("Expected error, got nil")
+		}
 	})
 
 	t.Run("Inject", func(t *testing.T) {
@@ -165,14 +190,18 @@ func TestInjector(t *testing.T) {
 			Func(newC),
 		)
 		err := i.Resolve()
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
 		var dv d
 		err = i.Inject(&dv)
-		require.NoError(t, err)
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
 
-		assert.True(t, dv.C.started)
-		assert.True(t, dv.B.started)
-		assert.True(t, dv.A.started)
+		if !dv.C.started || !dv.B.started || !dv.A.started {
+			t.Errorf("Expected all true, got A: %t, B: %t, C: %t", dv.A.started, dv.B.started, dv.C.started)
+		}
 	})
 }
