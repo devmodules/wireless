@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/devmodules/wireless"
+	"github.com/routercore/wireless"
 	"github.com/google/wire"
 )
 

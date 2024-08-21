@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/devmodules/wireless"
+	"github.com/routercore/wireless"
 )
 
 // Dependency as an example of dependency.

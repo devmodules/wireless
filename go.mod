@@ -1,4 +1,4 @@
-module github.com/devmodules/wireless
+module github.com/routercore/wireless
 
 go 1.22.3
 

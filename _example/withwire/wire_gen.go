@@ -7,7 +7,7 @@
 package main
 
 import (
-	"github.com/devmodules/wireless"
+	"github.com/routercore/wireless"
 )
 
 // Injectors from inject.go:
